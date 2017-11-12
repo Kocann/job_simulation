@@ -10,7 +10,8 @@ module.exports = {
     contentBase: './dist'
   },
   module: {
-    rules: [{
+    rules: [
+    {
       test: /\.scss$/,
       use: [{
           loader: "style-loader" // creates style nodes from JS strings
@@ -19,6 +20,16 @@ module.exports = {
       }, {
           loader: "sass-loader" // compiles Sass to CSS
       }]
+    },
+    {
+      test: /\.js$/,
+      exclude: /(node_modules|bower_components)/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env']
+        }
+      }
     }]
 }
 };
