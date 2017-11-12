@@ -1,0 +1,23 @@
+{
+  "name": "job_simulation",
+  "version": "1.0.0",
+  "description": "A simple game about everyday work life with dose of humor :)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kocann/job_simulation.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kocann/job_simulation/issues"
+  },
+  "homepage": "https://github.com/Kocann/job_simulation#readme",
+  "devDependencies": {
+    "webpack": "^3.8.1"
+  }
+}
