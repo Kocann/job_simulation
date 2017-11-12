@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import './styles/example.style.scss';
 
 
 function component() {
@@ -6,6 +7,7 @@ function component() {
 
   // Lodash, currently included via a script, is required for this line to work
   element.innerHTML = _.join(['Hello', 'webpack'], ' ');
+  element.className += "example";
 
   return element;
 }
