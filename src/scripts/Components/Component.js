@@ -6,7 +6,6 @@ export class Component {
     this.height = height;
     this.movingX = 0;
     this.movingY = 0;
-    
     this.type = type;
     this.healthPoints;
     this.kind;
@@ -35,11 +34,11 @@ export class Component {
     }
     
     this.crashed = (obstacle) => {
-      // mainPlayer actual size and position
-      let mainPlayerLeft = this.x;
-      let mainPlayerRight = this.x + this.width;
-      let mainPlayerTop = this.y;
-      let mainPlayerBottom = this.y + this.height;
+      // component actual size and position
+      let borderLeft = this.x;
+      let borderRight = this.x + this.width;
+      let borderTop = this.y;
+      let borderBottom = this.y + this.height;
       
       // obstacle actual size and position
       let obstacleLeft = obstacle.x;
@@ -47,16 +46,15 @@ export class Component {
       let obstacleTop = obstacle.y;
       let obstacleBottom = obstacle.y + obstacle.height;
       
-      var crash = true;
-      // checking if mainPlayer and Obstacles coords collide
-      if((mainPlayerLeft > (obstacleRight)) ||
-         (mainPlayerRight < (obstacleLeft)) ||
-         (mainPlayerTop > (obstacleBottom)) ||
-         (mainPlayerBottom < (obstacleTop))) {
-         crash = false;  
+      // checking if components coords collide
+      if((borderLeft > (obstacleRight)) ||
+         (borderRight < (obstacleLeft)) ||
+         (borderTop > (obstacleBottom)) ||
+         (borderBottom < (obstacleTop))) {
+         return false;  
       }
       
-      return crash;
+      return true;
     }
   }
 }

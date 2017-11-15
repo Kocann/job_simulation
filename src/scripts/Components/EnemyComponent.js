@@ -11,6 +11,7 @@ export class EnemyComponent extends Component {
      "#dd0000"
    );
     this.kind = "enemyComponent";
+    this.power = power;
     this.healthPoints = power * -1;
     this.movingX = speed;
     this.movingY = speed;

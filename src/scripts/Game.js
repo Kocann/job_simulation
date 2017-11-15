@@ -1,6 +1,7 @@
 import {MainPlayerComponent} from './Components/MainPlayerComponent';
 import {CofeeComponent} from './Components/CoffeComponent';
 import {EnemyComponent} from'./Components/EnemyComponent';
+import {BulletComponent} from './Components/BulletComponent';
 
 export class Game {
   constructor() {
@@ -31,21 +32,22 @@ export class Game {
     this.updateInterval = setInterval(()=> {
       this.components.forEach((x,i) => {
         if (this.mainPlayer.crashed(x)) {
-          this.updatePlayerAndObstacleAction(this.mainPlayer, x);
+          this.componentsInteraction(this.mainPlayer, x);
           return;
         }
       })
+
       this.clear();
-      // enemies moving
-       this.components.filter(x => x.kind === "enemyComponent").forEach((x,i) => {
-         x.moveTo(this.cnv);
-       });
-      
-      
+
+      // components moving
+      this.components.filter(x => x.kind !== "coffeComponent").forEach((x,i) => {
+        x.moveTo(this.cnv);
+      });
+  
       // mainPlayer moving and updating all components
       this.mainPlayer.movingX = 0;
       this.mainPlayer.movingY = 0;
-      this.moveMainPlayer();
+      this.controlComponents();
       this.mainPlayer.moveTo(this.cnv);
       this.mainPlayer.update(this.ctx);
       this.components.forEach((x,i) => {
@@ -55,13 +57,26 @@ export class Game {
   }
   
   // TODO: refractor code so its more versatile and readible 
-  moveMainPlayer() {
-    if (this.keys && this.keys[37] && this.mainPlayer.x != 0) {this.mainPlayer.movingX = -1; }
-    if (this.keys && this.keys[39] && this.mainPlayer.x != this.cnv.width - this.mainPlayer.width) {this.mainPlayer.movingX = 1; }
-    if (this.keys && this.keys[38] && this.mainPlayer.y != 0) {this.mainPlayer.movingY = -1; }
-    if (this.keys && this.keys[40] && this.mainPlayer.y != this.cnv.height - this.mainPlayer.height) {this.mainPlayer.movingY = 1; }
+  controlComponents() {
+    if (this.keys && this.mainPlayerCanMove()) {
+      if (this.keys[37]) {this.mainPlayer.movingX = -1}   
+      if (this.keys[39]) {this.mainPlayer.movingX = 1}
+      if (this.keys[38]) {this.mainPlayer.movingY = -1}
+      if (this.keys[40]) {this.mainPlayer.movingY = 1}
+      if (this.keys[32]) {this.components.push(new BulletComponent(this.mainPlayer.x, this.mainPlayer.y))}
+   }
   }
   
+  mainPlayerCanMove() {
+    if ((this.mainPlayer.x != 0) ||
+        (this.mainPlayer.y != 0) ||
+        (this.mainPlayer.x != this.cnv.width - this.mainPlayer.width) ||
+        (this.mainPlayer.y != this.cnv.height - this.mainPlayer.height)) {
+        return true;
+    }
+    return false;
+  }
+
   enableControls() {
     window.addEventListener('keydown', (e) => {
       this.keys[e.keyCode] = (e.type == "keydown");
@@ -72,17 +87,23 @@ export class Game {
   }
   
   // TODO: add diffrent action (depending on obstacle kind)
-  updatePlayerAndObstacleAction(player, obstacle) {
-    player.healthPoints += obstacle.healthPoints;
-    document.getElementById("healthValue").innerText = player.healthPoints;
-    
-    obstacle.x = Math.floor(Math.random()*(this.cnv.width - obstacle.width));
-    obstacle.y = Math.floor(Math.random()*(this.cnv.height - obstacle.height));
+  componentsInteraction(component, obstacle) {   
+    if (component === this.mainPlayer && obstacle.kind === "heathComponent") {
+      component.healthPoints += obstacle.healthPoints;
+      document.getElementById("mainPlayerHealthValue").innerText = component.healthPoints;
+      obstacle.x = Math.floor(Math.random()*(this.cnv.width - obstacle.width));
+      obstacle.y = Math.floor(Math.random()*(this.cnv.height - obstacle.height));
+    } else if (component.kind === "bulletComponent" && obstacle.kind === "enemyComponent") {
+      obstacle.healthPoints -= component.power;
+      this.components.slice(findIndex(component),1);
+      console.log(component)
+    }
   }
   
   init() {
     document.body.appendChild(this.cnv);
     this.enableControls();
-    document.getElementById("healthValue").innerText = this.mainPlayer.healthPoints;
+    document.getElementById("mainPlayerHealthValue").innerText = this.mainPlayer.healthPoints;
+    document.getElementById("robbotox2000HealthPoints").innerText = this.components.filter((x)=>x.kind == "enemyComponent")[0].power;    
   }
 }
