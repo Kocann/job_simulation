@@ -12,7 +12,7 @@ export class EnemyComponent extends Component {
    );
     this.kind = "enemyComponent";
     this.power = power;
-    this.healthPoints = power * -1;
+    this.healthPoints = power;
     this.movingX = speed;
     this.movingY = speed;
   }

@@ -21,6 +21,7 @@ export class Game {
     
     // setting visible components
     this.mainPlayer = new MainPlayerComponent(50, 50, "blue")
+    this.components.push(this.mainPlayer);
     this.components.push(new CofeeComponent(25, "img"));
     this.components.push(new EnemyComponent(600, 290, 2));
     
@@ -30,12 +31,19 @@ export class Game {
     }
     
     this.updateInterval = setInterval(()=> {
-      this.components.forEach((x,i) => {
-        if (this.mainPlayer.crashed(x)) {
-          this.componentsInteraction(this.mainPlayer, x);
-          return;
-        }
-      })
+  
+      this.components.forEach((x,i) => {  
+        let restEl = this.components.filter((item) => {
+          return item !== x
+        })
+
+        restEl.map((el)=>{
+          if (x.crashed(el)) {
+            this.componentsInteraction(x,el);
+          }
+        })
+       })
+ 
 
       this.clear();
 
@@ -58,28 +66,18 @@ export class Game {
   
   // TODO: refractor code so its more versatile and readible 
   controlComponents() {
-    if (this.keys && this.mainPlayerCanMove()) {
-      if (this.keys[37]) {this.mainPlayer.movingX = -1}   
-      if (this.keys[39]) {this.mainPlayer.movingX = 1}
-      if (this.keys[38]) {this.mainPlayer.movingY = -1}
-      if (this.keys[40]) {this.mainPlayer.movingY = 1}
-      if (this.keys[32]) {this.components.push(new BulletComponent(this.mainPlayer.x, this.mainPlayer.y))}
+    if (this.keys) {
+      if (this.keys[37] && this.mainPlayer.x != 0) {this.mainPlayer.movingX = -1}   
+      if (this.keys[39] && this.mainPlayer.x != this.cnv.width - this.mainPlayer.width) {this.mainPlayer.movingX = 1}
+      if (this.keys[38] && this.mainPlayer.y != 0) {this.mainPlayer.movingY = -1}
+      if (this.keys[40] && this.mainPlayer.y != this.cnv.height - this.mainPlayer.height) {this.mainPlayer.movingY = 1}
    }
-  }
-  
-  mainPlayerCanMove() {
-    if ((this.mainPlayer.x != 0) ||
-        (this.mainPlayer.y != 0) ||
-        (this.mainPlayer.x != this.cnv.width - this.mainPlayer.width) ||
-        (this.mainPlayer.y != this.cnv.height - this.mainPlayer.height)) {
-        return true;
-    }
-    return false;
   }
 
   enableControls() {
     window.addEventListener('keydown', (e) => {
       this.keys[e.keyCode] = (e.type == "keydown");
+      if (e.keyCode === 32) {this.components.push(new BulletComponent(this.mainPlayer.x, this.mainPlayer.y))}
     })
     window.addEventListener('keyup', (e) => {
       this.keys[e.keyCode] = (e.type == "keydown");            
@@ -87,16 +85,20 @@ export class Game {
   }
   
   // TODO: add diffrent action (depending on obstacle kind)
-  componentsInteraction(component, obstacle) {   
+  componentsInteraction(component, obstacle) {
+    
+    //mainPlayer interaction with healthComponent   
     if (component === this.mainPlayer && obstacle.kind === "heathComponent") {
       component.healthPoints += obstacle.healthPoints;
       document.getElementById("mainPlayerHealthValue").innerText = component.healthPoints;
       obstacle.x = Math.floor(Math.random()*(this.cnv.width - obstacle.width));
       obstacle.y = Math.floor(Math.random()*(this.cnv.height - obstacle.height));
+
+      // bullet interaction with enemyComponent
     } else if (component.kind === "bulletComponent" && obstacle.kind === "enemyComponent") {
       obstacle.healthPoints -= component.power;
-      this.components.slice(findIndex(component),1);
-      console.log(component)
+      this.components.splice(this.components.indexOf(component),1);
+      document.getElementById("robbotox2000HealthPoints").innerText = obstacle.healthPoints;
     }
   }
   
@@ -104,6 +106,6 @@ export class Game {
     document.body.appendChild(this.cnv);
     this.enableControls();
     document.getElementById("mainPlayerHealthValue").innerText = this.mainPlayer.healthPoints;
-    document.getElementById("robbotox2000HealthPoints").innerText = this.components.filter((x)=>x.kind == "enemyComponent")[0].power;    
+    document.getElementById("robbotox2000HealthPoints").innerText = this.components.filter((x)=>x.kind == "enemyComponent")[0].healthPoints;    
   }
 }
